@@ -1,0 +1,921 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ilia Lopukhov · Portfolio for Swann</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500&family=Literata:ital,opsz,wght@1,7..72,400&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: страница кейса ony.ru, переложенная в слайд 1920×1080. Белое поле, текст слева, тихая видеопетля справа, кегль маленький, вес 400. В тёмной теме — инверсия в духе Magma. */
+:root{
+  --bg:#ffffff; --fg:#191919; --muted:rgba(25,25,25,.46); --faint:rgba(25,25,25,.28);
+  --surface:#f7f7f7; --tag:#ebebeb; --line:rgba(25,25,25,.1);
+  --f-text:'Onest','Golos Text',Arial,sans-serif;
+  --f-serif:'Literata','Source Serif 4',Georgia,serif;
+  --f-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.4,0,.2,1); --ease-form:cubic-bezier(.22,1,.36,1); --ease-spring:cubic-bezier(.22,1.2,.36,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --fg:#ffffff; --muted:rgba(255,255,255,.5); --faint:rgba(255,255,255,.3);
+  --surface:#111111; --tag:#1d1d1d; --line:rgba(255,255,255,.14); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#000000; --fg:#ffffff; --muted:rgba(255,255,255,.5); --faint:rgba(255,255,255,.3);
+  --surface:#111111; --tag:#1d1d1d; --line:rgba(255,255,255,.14); color-scheme:dark }
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-text);font-weight:400;-webkit-font-smoothing:antialiased;overflow:hidden}
+*{box-sizing:border-box}
+h1,h2,h3,p,dl,dd,figure{margin:0}
+h1,h2,h3{font-weight:400;text-wrap:balance}
+button{font:inherit;color:inherit}
+.it{font-family:var(--f-serif);font-style:italic;font-weight:400}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.muted{color:var(--muted)}
+
+/* сцена */
+.viewport{position:fixed;inset:0;overflow:hidden;background:var(--bg)}
+.stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--k,.5));transform-origin:50% 50%}
+.bar{position:absolute;left:0;right:0;top:0;height:72px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;font-size:18px;z-index:10}
+.bar .who{display:flex;gap:10px;align-items:baseline}
+.bar .right{display:flex;align-items:center;gap:18px}
+.bar .label{color:var(--muted)}
+.nav{display:flex;gap:8px}
+.nav button{border:0;background:var(--surface);border-radius:100px;width:52px;height:40px;font-size:20px;cursor:pointer;transition:background .4s var(--ease)}
+.nav button:hover{background:var(--tag)}
+.nav button:focus-visible,.snd:focus-visible,.row:focus-visible,.thumbs button:focus-visible,.copy:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+
+.slide{position:absolute;inset:0;padding:96px 32px 40px;opacity:0;visibility:hidden;transition:opacity .4s var(--ease),visibility 0s linear .4s}
+.slide.is-active{opacity:1;visibility:visible;transition:opacity .4s var(--ease) .1s,visibility 0s}
+.slide.instant{transition:none!important}
+.first .w,.first .focus,.first .draw::before{animation:none!important}
+
+/* типографика сцены */
+.h1{font-size:56px;line-height:60px;letter-spacing:-.01em}
+.h2{font-size:50px;line-height:56px;letter-spacing:-.01em}
+.mid{font-size:32px;line-height:38px}
+.body{font-size:21px;line-height:28px}
+.small{font-size:18px;line-height:24px}
+.cap{font-size:16px;line-height:20px;letter-spacing:.015em}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{font-size:17px;line-height:20px;padding:8px 16px;border-radius:100px;background:var(--tag)}
+.pill.ghost{background:transparent;padding-left:4px;color:var(--muted)}
+
+/* появление */
+.is-active .w{animation:word 1.05s var(--ease-form) both;animation-delay:calc(var(--i) * .115s)}
+@keyframes word{from{opacity:0}to{opacity:1}}
+.is-active .focus{animation:focus .76s var(--ease-spring) both .25s}
+@keyframes focus{from{filter:blur(8px);transform:scale(.94);opacity:0}to{filter:none;transform:none;opacity:1}}
+.draw{position:relative}
+.draw::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line);transform-origin:left;transform:scaleX(1)}
+.is-active .draw::before{animation:draw .8s cubic-bezier(.18,.06,.2,.95) both;animation-delay:calc(.2s + var(--d,0) * .06s)}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* медиа */
+.media{position:relative;border-radius:12px;overflow:hidden;background:var(--surface);min-height:0}
+.media video,.media img{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.media img{cursor:default}
+.media.contain video{object-fit:contain}
+.snd{position:absolute;left:16px;bottom:16px;border:0;border-radius:100px;padding:8px 14px;font-size:15px;line-height:18px;cursor:pointer;background:rgba(255,255,255,.86);color:#191919;backdrop-filter:none;transition:opacity .4s var(--ease)}
+.snd[aria-pressed="true"]{background:#191919;color:#fff}
+.dur{position:absolute;right:16px;bottom:16px;font-size:14px;padding:6px 10px;border-radius:100px;background:rgba(0,0,0,.45);color:#fff}
+
+/* 1. обложка */
+.cover{display:grid;grid-template-rows:auto 1fr;gap:40px}
+.cover-head{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start;padding-top:120px}
+.cover-head .sub{margin-top:14px;font-size:32px;line-height:40px}
+.cover-head .meta{display:flex;flex-direction:column;align-items:flex-end;gap:14px;padding-top:8px}
+.cover .media{border-radius:12px}
+
+/* 2. манифест */
+.manifest{display:grid;grid-template-rows:1fr auto auto;gap:48px;padding-top:200px}
+.manifest .h2{max-width:1640px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stats div{padding-top:16px}
+.stats b{display:block;font-weight:400;font-size:32px;line-height:38px;margin-bottom:6px}
+.ticker{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);font-size:18px;white-space:nowrap}
+.ticker .track{display:inline-flex;gap:44px;animation:tick 48s linear infinite;padding-right:44px}
+.ticker span i{font-style:normal;color:var(--muted);margin-left:6px}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* 3. цитаты */
+.quotes{display:grid;grid-template-rows:auto 1fr auto;gap:36px}
+.quotes .rows{display:grid;align-content:center}
+.qrow{display:grid;grid-template-columns:1fr 520px;gap:48px;padding:20px 0 22px;align-items:baseline}
+.qrow q{font-family:var(--f-serif);font-style:italic;font-size:34px;line-height:42px;quotes:"«" "»"}
+.qrow .src b{display:block;font-weight:400;font-size:20px;line-height:26px}
+.quotes .after{max-width:1100px}
+
+/* 4. процесс */
+.process{display:grid;grid-template-rows:auto 1fr auto;gap:28px}
+.ptable{display:grid;align-content:center}
+.prow{display:grid;grid-template-columns:70px 330px 1fr 1fr;gap:32px;padding:18px 0 20px;align-items:baseline}
+.prow.head{padding-bottom:10px}
+.prow .n{font-size:21px}
+.prow .t{font-size:28px;line-height:34px}
+.prow .c{font-size:20px;line-height:27px}
+
+/* 5. индекс */
+.index{display:grid;grid-template-rows:auto 1fr;gap:28px}
+.itable{display:grid;align-content:start}
+.row{display:grid;grid-template-columns:60px 1fr 330px 160px 300px;gap:28px;padding:15px 0 16px;font-size:21px;line-height:26px;cursor:pointer;transition:opacity .4s var(--ease);border:0;background:none;text-align:left;width:100%}
+.row.head{cursor:default;font-size:16px;color:var(--muted);padding-bottom:10px}
+.itable:hover .row:not(.head){opacity:.3}
+.itable .row:not(.head):hover{opacity:1}
+.peek{position:absolute;width:300px;aspect-ratio:16/9;border-radius:8px;overflow:hidden;pointer-events:none;opacity:0;transform:translateY(10px) scale(.95);transition:opacity .3s var(--ease),transform .5s cubic-bezier(.34,1.56,.64,1);z-index:20;background:var(--surface)}
+.peek.on{opacity:1;transform:none}
+.peek img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* кейс */
+.case{display:grid;grid-template-columns:620px 1fr;gap:48px;height:100%}
+.case .info{display:flex;flex-direction:column;gap:26px;min-width:0;padding-top:24px}
+.case .head{display:flex;flex-direction:column;gap:22px}
+.facts{display:grid}
+.facts div{display:grid;grid-template-columns:170px 1fr;gap:20px;padding:12px 0 13px}
+.facts dt{font-size:16px;line-height:24px;color:var(--muted)}
+.facts dd{font-size:18px;line-height:24px}
+.rhyme{padding-top:14px;display:grid;gap:6px}
+.rhyme .it{font-size:24px;line-height:30px}
+.credits{margin-top:auto;padding-top:14px;display:grid;grid-template-columns:170px 1fr;gap:20px;font-size:18px;line-height:24px}
+.case .media{height:100%}
+.case .stack{display:grid;grid-template-rows:1fr 1fr;gap:16px;min-height:0}
+.case.vert{grid-template-columns:620px 1fr}
+.vertwrap{display:grid;grid-template-columns:auto 1fr;gap:16px;min-height:0;height:100%}
+.vertwrap .media{aspect-ratio:9/16;height:100%;width:auto}
+.vertwrap .note{align-self:end;max-width:460px}
+
+/* канон */
+.canon{display:grid;grid-template-columns:520px 1fr;gap:48px;height:100%}
+.canon .info{display:flex;flex-direction:column;gap:22px;padding-top:24px}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1.25fr 1fr;gap:12px;min-height:0}
+.cgrid .media{border-radius:8px}
+.cgrid figure{display:grid;grid-template-rows:1fr auto;gap:8px;min-height:0}
+.cgrid figcaption{font-size:15px;color:var(--muted)}
+.cgrid .span2{grid-column:span 2}
+
+/* стратегия */
+.strat{display:grid;grid-template-rows:auto 1fr;gap:28px;height:100%}
+.strat .cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;min-height:0}
+.strat article{display:grid;grid-template-rows:1fr auto;gap:22px;min-height:0}
+.strat .txt{display:grid;gap:12px}
+.nums{display:flex;gap:28px;flex-wrap:wrap;font-size:18px}
+.nums b{font-weight:400;font-size:28px;display:block;line-height:32px}
+
+/* Настя */
+.duo{display:grid;grid-template-columns:720px 1fr;gap:48px;height:100%}
+.duo .info{display:flex;flex-direction:column;gap:26px;padding-top:24px}
+.awards{display:grid}
+.awards div{padding:11px 0 12px;font-size:20px;line-height:26px}
+.thumbs{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:center}
+.thumbs button{border:0;padding:0;background:none;text-align:left;cursor:pointer;display:grid;gap:10px}
+.thumbs .media{aspect-ratio:16/9;border-radius:8px}
+.thumbs img{transition:transform .6s var(--ease)}
+.thumbs button:hover img{transform:scale(1.02)}
+
+/* наброски */
+.ideas{display:grid;grid-template-rows:auto 1fr;gap:36px}
+.icols{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;align-content:center}
+.icol{display:grid;gap:16px;align-content:start;padding-top:20px}
+.icol .n{font-size:21px;color:var(--muted)}
+.icol h3{font-size:34px;line-height:40px}
+.icol .src{font-size:16px;color:var(--muted);padding-top:14px}
+
+/* финал */
+.final{display:grid;place-items:center;text-align:center}
+.final .pair{position:relative;height:40px;width:600px;font-size:28px;line-height:40px}
+.final .pair span{position:absolute;inset:0}
+.is-active .final .p1{animation:p1 3.6s var(--ease) both}
+.is-active .final .p2{animation:p2 3.6s var(--ease) both}
+@keyframes p1{0%{opacity:0}12%{opacity:1}42%{opacity:1}55%,100%{opacity:0}}
+@keyframes p2{0%,55%{opacity:0}70%,100%{opacity:1}}
+.final .sign{position:absolute;left:0;right:0;bottom:56px;display:grid;justify-items:center;gap:14px;font-size:18px}
+.contact{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.copy{border:0;background:var(--surface);border-radius:100px;padding:10px 20px;font-size:18px;cursor:pointer;transition:background .4s var(--ease)}
+.copy:hover{background:var(--tag)}
+.contact a{color:inherit;text-decoration:none}
+
+/* телефон: слайды становятся лентой */
+@media (max-width: 820px){
+  body{overflow:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .viewport{position:static;overflow:visible}
+  .stage{position:static;width:auto;height:auto;transform:none}
+  .bar{position:sticky;top:env(safe-area-inset-top,0px);height:52px;padding:0;background:var(--bg);font-size:14px}
+  .bar .label,.nav{display:none}
+  .slide{position:static;opacity:1;visibility:visible;padding:40px 0 48px;border-top:1px solid var(--line)}
+  .slide:first-of-type{border-top:0}
+  .h1{font-size:30px;line-height:34px}.h2{font-size:26px;line-height:31px}.mid{font-size:21px;line-height:27px}
+  .body{font-size:17px;line-height:24px}.small{font-size:15px;line-height:21px}
+  .cover-head{grid-template-columns:1fr;padding-top:8px;gap:20px}.cover-head .sub{font-size:21px;line-height:27px}
+  .cover-head .meta{align-items:flex-start}
+  .cover .media{aspect-ratio:16/9}
+  .manifest{padding-top:0;gap:28px}.stats{grid-template-columns:1fr 1fr}.stats b{font-size:22px;line-height:28px}
+  .qrow{grid-template-columns:1fr;gap:10px}.qrow q{font-size:22px;line-height:29px}
+  .prow{grid-template-columns:28px 1fr;gap:10px 14px}.prow .c{grid-column:2;font-size:16px;line-height:22px}.prow .t{font-size:21px}
+  .prow.head{display:none}.prow .c::before{content:attr(data-k);display:block;color:var(--muted);font-size:13px}
+  .row{grid-template-columns:24px 1fr;gap:4px 12px;font-size:16px;line-height:21px}.row>:nth-child(n+3){grid-column:2;color:var(--muted);font-size:14px}
+  .row.head{display:none}
+  .case,.case.vert,.canon,.duo{grid-template-columns:1fr;gap:24px;height:auto}
+  .case .info,.canon .info,.duo .info{padding-top:0;gap:18px}
+  .facts div,.credits{grid-template-columns:110px 1fr;gap:12px}
+  .facts dd,.credits{font-size:15px;line-height:21px}
+  .case .media{aspect-ratio:16/9;height:auto}
+  .case .stack{grid-template-rows:auto}
+  .vertwrap{grid-template-columns:1fr;height:auto}.vertwrap .media{width:100%;max-width:340px;height:auto}
+  .cgrid{grid-template-columns:1fr 1fr;grid-template-rows:auto}.cgrid .media{aspect-ratio:3/4}.cgrid .span2 .media{aspect-ratio:16/9}
+  .strat{height:auto}.strat .cols{grid-template-columns:1fr}.strat .media{aspect-ratio:16/9}
+  .thumbs{grid-template-columns:1fr 1fr}
+  .icols{grid-template-columns:1fr;gap:12px}.icol h3{font-size:22px;line-height:28px}
+  .final{min-height:70vh}.final .pair{width:100%;font-size:21px}.final .sign{position:static;margin-top:40px}
+  .is-active .w,.w{animation:none!important}
+  .slide>div{height:auto!important}
+  .focus,.is-active .focus,.draw::before,.is-active .draw::before{animation:none!important}
+  .cover,.manifest,.quotes,.process,.index,.ideas,.strat,.cgrid{grid-template-rows:none}
+  .final .pair{height:auto}.final .pair span{position:static;display:block;animation:none!important;opacity:1!important}
+  .ticker .track{animation-duration:30s}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before{animation:none!important;transition:none!important}
+  .final .p1{opacity:0}.final .p2{opacity:1}
+}
+/* v2: сетки картинок, вертикали, группы в индексе */
+.igrid{display:grid;gap:12px;min-height:0;height:100%}
+.igrid.g2{grid-template-columns:1fr 1fr;grid-template-rows:1.1fr 1fr}
+.igrid.g3{grid-template-columns:repeat(3,1fr);grid-template-rows:1.25fr 1fr}
+.igrid .top{grid-column:1/-1}
+.igrid .media{border-radius:8px;height:100%}
+.vrow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;min-height:0;height:100%;align-items:start}
+.vrow figure{display:grid;gap:10px}
+.vrow .media{aspect-ratio:9/16;height:auto;border-radius:8px}
+.vrow figcaption{font-size:16px;line-height:20px;color:var(--muted)}
+.row.group{cursor:default;font-size:16px;color:var(--muted);padding-top:22px;padding-bottom:8px;grid-template-columns:60px 1fr}
+.itable:hover .row.group{opacity:1}
+.case .stack.s3{grid-template-rows:1.45fr 1fr}
+.stack .sub2{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0}
+.stack .sub3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;min-height:0}
+.stack .sub2 .media,.stack .sub3 .media{border-radius:8px;height:100%}
+@media (max-width: 820px){
+  .igrid,.igrid.g2,.igrid.g3{grid-template-columns:1fr 1fr;grid-template-rows:none;height:auto}
+  .igrid .media{aspect-ratio:4/3;height:auto}.igrid .top .media{aspect-ratio:16/9}
+  .vrow{height:auto;grid-template-columns:1fr 1fr 1fr;gap:8px}.vrow figcaption{font-size:12px}
+  .case .stack.s3{grid-template-rows:none}
+  .stack .sub2 .media,.stack .sub3 .media{aspect-ratio:16/10;height:auto}
+  .row.group{display:block;padding-top:16px}
+}
+/* v3: привет, награды, четыре кейса, два ролика, клиенты */
+.hello{position:relative;height:100%}
+.hello h1{position:absolute;left:0;top:150px;font-size:88px;line-height:92px;letter-spacing:-.02em;font-weight:400}
+.hello .ph{position:absolute;right:0;bottom:0;width:460px;aspect-ratio:1/1;border-radius:0;overflow:hidden;background:var(--surface)}
+.hello .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.hello .ph-cap{position:absolute;right:476px;bottom:0;text-align:right}
+
+.awards3{display:grid;grid-template-columns:520px 1fr;gap:64px;height:100%;align-items:center}
+.awards3 .big{font-size:200px;line-height:180px;letter-spacing:-.04em}
+.awards3 .big-cap{margin-top:20px;max-width:420px}
+.atable{display:grid}
+.arow{display:grid;grid-template-columns:1fr 90px 1fr;gap:24px;padding:14px 0 15px;align-items:baseline;font-size:24px;line-height:30px}
+.arow .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.arow .h{color:var(--muted);font-size:20px}
+.anote{margin-top:22px}
+
+.four{display:grid;grid-template-rows:auto 1fr;gap:40px;height:100%}
+.flist{display:grid;align-content:center}
+.frow{display:grid;grid-template-columns:70px 640px 1fr;gap:32px;padding:26px 0 28px;align-items:baseline;border:0;background:none;text-align:left;width:100%;cursor:pointer;transition:opacity .4s var(--ease)}
+.flist:hover .frow{opacity:.3}.flist .frow:hover{opacity:1}
+.frow .n{font-size:24px;color:var(--muted)}
+.frow .c{font-size:28px;line-height:34px;color:var(--muted)}
+.frow .t{font-size:40px;line-height:46px}
+
+.two{display:grid;grid-template-rows:auto 1fr;gap:32px;height:100%}
+.tcols{display:grid;grid-template-columns:1fr 1fr;gap:32px;min-height:0}
+.tcol{display:grid;grid-template-rows:auto auto;gap:20px;align-content:start}
+.tcol .media{aspect-ratio:16/9}
+.tcol .txt{display:grid;gap:10px}
+
+.clients{display:grid;grid-template-rows:auto 1fr auto;gap:28px;height:100%}
+.wall{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.wall span{display:grid;place-items:center;text-align:center;padding:10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font-size:23px;line-height:27px;letter-spacing:-.01em;min-height:0}
+.cfoot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.cfoot .contact{justify-content:flex-end}
+
+@media (max-width: 820px){
+  .hello{display:grid;gap:24px}
+  .hello h1{position:static;font-size:40px;line-height:44px}
+  .hello .ph{position:static;width:min(320px,100%)}
+  .hello .ph-cap{position:static;text-align:left}
+  .awards3{grid-template-columns:1fr;gap:20px}.awards3 .big{font-size:88px;line-height:84px}
+  .arow{grid-template-columns:1fr 44px;font-size:17px;line-height:22px;gap:8px 12px}.arow .h{grid-column:1/-1;font-size:14px;margin-top:-4px}
+  .frow{grid-template-columns:24px 1fr;gap:4px 12px;padding:16px 0}.frow .c{font-size:14px;line-height:18px;grid-column:2}.frow .t{font-size:22px;line-height:27px;grid-column:2}
+  .frow .c{order:2}.frow .t{order:3}
+  .tcols{grid-template-columns:1fr;gap:28px}
+  .wall{grid-template-columns:repeat(3,1fr)}.wall span{font-size:13px;line-height:16px;padding:12px 4px;min-height:56px}
+  .cfoot{display:grid}
+}
+
+.wall{grid-template-rows:repeat(6,1fr)}
+@media (max-width: 820px){.wall{grid-template-rows:none}}
+/* v4: слайды шоу */
+.golink{align-self:flex-start;display:inline-block;font-size:18px;line-height:20px;padding:12px 20px;border-radius:100px;background:var(--fg);color:var(--bg);text-decoration:none;transition:opacity .3s var(--ease)}
+.golink:hover{opacity:.8}.golink:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.sfacts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.sfacts div{padding-top:12px;display:grid;gap:6px}
+.sfacts b{font-weight:400;font-size:34px;line-height:36px}
+.sfacts span{font-size:15px;line-height:19px;color:var(--muted)}
+.shead{display:grid;grid-template-columns:860px 1fr;gap:48px;align-items:start}
+.shead .body{max-width:760px}
+.hands{display:grid;grid-template-rows:auto 1fr auto;gap:32px;height:100%}
+.hcols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;min-height:0;align-content:start}
+.hcol{display:grid;gap:14px;align-content:start}
+.hcol .media{aspect-ratio:4/3;border-radius:8px}
+.hcol .media video,.hcol .media img{height:100%;object-fit:cover}
+.dz video{transform:scale(1.25)}
+.pipe{display:grid;grid-template-rows:auto auto auto auto;gap:24px;height:100%;align-content:start}
+.splitv{aspect-ratio:32/9;border-radius:8px;background:#000}
+.splitv video{height:100%;object-fit:cover}
+.splitv .tag{position:absolute;top:14px;font-size:15px;line-height:1;padding:8px 12px;border-radius:100px;background:rgba(255,255,255,.88);color:#191919}
+.splitv .tag.l{left:14px}.splitv .tag.r{left:calc(50% + 14px)}
+.psteps{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.psteps div{padding-top:12px;display:grid;gap:4px;align-content:start}
+.psteps b{font-weight:400;font-size:21px;line-height:26px}
+.psteps span:last-child{font-size:15px;line-height:20px;color:var(--muted)}
+.pfoot{display:flex;gap:40px;flex-wrap:wrap;align-items:baseline;font-size:18px}
+.pfoot b{font-weight:400;font-size:28px;margin-right:6px}
+.machine{display:grid;grid-template-columns:900px 1fr;gap:48px;height:100%}
+.mleft{display:flex;flex-direction:column;gap:26px;min-width:0}
+.chain{display:grid;grid-template-columns:.7fr .7fr 1.4fr 1.3fr;gap:12px;align-items:end}
+.chain .media{border-radius:8px}
+.chain figcaption{font-size:15px;line-height:19px;color:var(--muted);margin-top:8px}
+.chain figcaption .mono{color:var(--fg);margin-right:4px}
+.mleft .rhyme{margin-top:auto}
+.mright{display:flex;flex-direction:column;gap:24px;min-width:0}
+.outs{display:grid;grid-template-columns:1fr 1fr 1.12fr;gap:12px;align-items:end}
+.outs .media{border-radius:8px;aspect-ratio:9/16}
+.outs figure:last-child .media{aspect-ratio:4/5}
+.outs .media video{height:100%;object-fit:cover}
+.outs figcaption{font-size:15px;color:var(--muted);margin-top:8px}
+.mright .sfacts{grid-template-columns:repeat(3,1fr)}
+.mright .golink{margin-top:auto}
+@media (max-width: 820px){
+  .sfacts,.mright .sfacts{grid-template-columns:1fr 1fr}.sfacts b{font-size:24px;line-height:28px}
+  .shead,.machine{grid-template-columns:1fr;gap:16px}
+  .hands,.pipe{height:auto}.hcols{grid-template-columns:1fr;gap:28px}
+  .splitv{aspect-ratio:16/9}.splitv video{object-fit:contain}.splitv .tag{font-size:11px;padding:5px 7px}
+  .psteps{grid-template-columns:1fr 1fr}.psteps b{font-size:16px;line-height:20px}
+  .pfoot{gap:12px;font-size:15px}.pfoot b{font-size:20px}
+  .chain{grid-template-columns:1fr 1fr}
+  .outs{grid-template-columns:1fr 1fr 1fr}
+}
+
+.chain{grid-template-columns:1fr 1fr;align-items:start;gap:14px}
+.chain .media{height:auto}
+.chain figure:nth-child(-n+2) .media{aspect-ratio:4/3}
+.chain figure:nth-child(n+3) .media{aspect-ratio:16/9}
+.chain .media img{width:100%;height:100%;object-fit:cover;object-position:center 22%}
+@media (max-width: 820px){.chain figure .media{aspect-ratio:4/3}}
+
+/* v6: видео без обрезки, рамки по пропорциям роликов */
+.case > .media{height:auto;aspect-ratio:16/9;align-self:center}
+.case .stack.s3{grid-template-rows:auto auto;align-content:center}
+.case .stack.s3 > .media{aspect-ratio:16/9;height:auto}
+.stack .sub3 .media{aspect-ratio:16/9;height:auto}
+.media video{object-fit:contain;background:#000}
+.hcol .media{aspect-ratio:16/9}
+.hcol .media img{object-fit:contain;background:var(--surface)}
+.dz video{transform:scale(1.6)}
+@media (max-width: 820px){.case > .media{align-self:auto}}
+
+.logos2{background:#07180F;display:grid;grid-template-columns:1.9fr 1fr;align-items:center;gap:6%;padding:0 7%}
+.hcol .media.logos2 img{width:100%;height:auto;object-fit:contain;background:none}
+@media (max-width: 820px){.logos2{padding:0 6%}}
+
+/* браузер для сайта MIRA */
+.browser{align-self:center;border-radius:10px;overflow:hidden;background:var(--tag);box-shadow:0 0 0 1px var(--line)}
+.bbar{height:40px;display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--tag)}
+.bbar i{width:12px;height:12px;border-radius:50%;background:var(--faint)}
+.bbar .url{margin-left:14px;font-size:15px;padding:5px 14px;border-radius:100px;background:var(--bg);color:var(--muted)}
+.browser .media{aspect-ratio:16/10;border-radius:0;height:auto}
+.browser .media video{object-fit:cover;background:#000}
+@media (max-width: 820px){.bbar{height:30px}.bbar .url{font-size:12px}}
+
+.mira-r{display:grid;grid-template-columns:2.3fr 1fr;gap:16px;align-items:center;min-height:0}
+.mira-r .browser{align-self:center}
+.mira-el{display:grid;gap:16px;align-content:center}
+.mira-el .media{aspect-ratio:16/9;border-radius:8px;height:auto}
+.mira-el figcaption{margin-top:8px}
+@media (max-width: 820px){.mira-r{grid-template-columns:1fr}.mira-el{grid-template-columns:1fr 1fr}}
+
+/* финал: одна фраза */
+.final p.pair{width:auto;height:auto;font-size:56px;line-height:60px;letter-spacing:-.01em}
+@media (max-width: 820px){.final p.pair{font-size:30px;line-height:34px}}
+
+/* пайплайн шоу: шаги + цепочка в один ряд */
+.pfacts div{grid-template-columns:150px 1fr;padding:10px 0 11px}
+.pfacts dd{font-size:17px;line-height:23px}
+.mleft .chain{grid-template-columns:repeat(4,1fr);gap:12px}
+.mleft .chain figure .media{aspect-ratio:4/3}
+.mleft .chain figcaption{font-size:14px;line-height:18px}
+@media (max-width: 820px){.mleft .chain{grid-template-columns:1fr 1fr}.pfacts div{grid-template-columns:96px 1fr}}
+
+/* слайд «Как сделано» */
+.flow{display:flex;flex-direction:column;height:100%}
+.flow .h2{margin-bottom:22px}
+.flabel{font-size:18px;line-height:24px;max-width:1500px;margin:0 0 12px}
+.flabel b{font-weight:500}
+.frow{display:flex;gap:12px;align-items:flex-start;margin-bottom:22px}
+.frow figure{margin:0;display:flex;flex-direction:column;gap:8px;flex:none}
+.frow .media{height:292px;aspect-ratio:var(--ar);width:auto;border-radius:8px}
+.frow .media img,.frow .media video{width:100%;height:100%;object-fit:cover}
+.frow figcaption{font-size:14px;line-height:18px;color:var(--muted);max-width:420px}
+.frow figcaption .mono{color:var(--fg);margin-right:4px}
+.fside{flex:1;display:flex;flex-direction:column;justify-content:space-between;height:292px;padding-left:20px;min-width:0}
+.fside .sfacts{grid-template-columns:1fr}
+.fside .sfacts div{padding-top:10px}
+@media (max-width: 820px){
+  .flow{height:auto}.frow{flex-wrap:wrap}
+  .frow figure{width:calc(50% - 6px)}
+  .frow .media{height:auto;width:100%}
+  .fside{height:auto;padding-left:0;width:100%;gap:16px}
+}
+
+/* Swann: brand book grid, vertical film */
+.bb{display:grid;grid-template-rows:auto 1fr;gap:28px;height:100%}
+.bbgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 12px;align-content:center;min-height:0}
+.bbgrid figure{display:grid;gap:10px;min-height:0}
+.bbgrid .media{border-radius:8px;aspect-ratio:16/9;height:auto;box-shadow:0 0 0 1px var(--line)}
+.bbgrid .media img{object-fit:cover}
+.bbgrid figcaption{font-size:16px;line-height:20px;color:var(--muted)}
+.bbgrid .wide{grid-column:span 2}
+.case.vert .vertwrap .media{border-radius:12px}
+.reels{display:grid;grid-template-rows:auto 1fr auto;gap:28px;height:100%}
+.rrow{display:flex;gap:16px;align-items:flex-end;min-height:0}
+.rrow figure{display:grid;gap:10px;margin:0}
+.rrow .media{border-radius:8px}
+.rrow .r916{width:338px}.rrow .r916 .media{width:338px;height:600px}
+.rrow .r45{width:368px}.rrow .r45 .media{width:368px;height:460px}
+.rrow figcaption{font-size:16px;line-height:20px;color:var(--muted)}
+.rfoot{display:flex;gap:40px;font-size:18px;align-items:baseline}
+.rfoot b{font-weight:400;font-size:28px}
+@media (max-width: 820px){.rrow{flex-wrap:wrap}.rrow figure,.rrow .r916,.rrow .r45{width:calc(50% - 8px)}.rrow .r916 .media,.rrow .r45 .media{width:100%;height:auto}.rrow .r916 .media{aspect-ratio:9/16}.rrow .r45 .media{aspect-ratio:4/5}}
+@media (max-width: 820px){.bbgrid{grid-template-columns:1fr 1fr;grid-template-rows:none}.bbgrid .media{aspect-ratio:16/9;height:auto}.bbgrid .wide{grid-column:span 2}}
+</style>
+
+<div class="viewport" id="vp">
+<div class="stage" id="stage">
+
+<header class="bar">
+  <div class="who"><span>Ilia Lopukhov</span><span class="muted">for Swann</span></div>
+  <div class="right"><span class="label" id="label"></span><span class="mono" id="count">1 / 16</span>
+    <div class="nav"><button id="prev" aria-label="Previous slide">←</button><button id="next" aria-label="Next slide">→</button></div></div>
+</header>
+
+<section class="slide" data-label="Hello">
+ <div class="hello">
+  <h1 class="t">Hi, I'm Ilia.</h1>
+  <div class="ph focus"><img src="assets/img/ilia.jpg" alt="Ilia Lopukhov"></div>
+ </div>
+</section>
+
+<section class="slide" data-label="The role">
+ <div class="process">
+  <h2 class="h2 t">What the role asks for. Where I have already done it</h2>
+  <div class="ptable">
+   <div class="prow head small muted"><span></span><span>The job</span><span>Proof</span><span>Case</span></div>
+   <div class="prow draw" style="--d:0"><span class="n mono muted">1</span><span class="t">Brand voice &amp; messaging</span><span class="c">Took a category stuck on specs to a voice people remember: a phone launch sold on a human truth</span><span class="c muted">TECNO × MIXIT</span></div>
+   <div class="prow draw" style="--d:1"><span class="n mono muted">2</span><span class="t">Integrated campaigns</span><span class="c">A two-stage plan: build consumer demand first, then sell it to manufacturers and retail</span><span class="c muted">SIBUR · Vivilen</span></div>
+   <div class="prow draw" style="--d:2"><span class="n mono muted">3</span><span class="t">Numbers and KPIs</span><span class="c">Awareness 8.1% → 15.2%, CPA −35%, plant load 20% → 80%, KPIs beaten 2×</span><span class="c muted">SIBUR · GetTransfer · TECNO</span></div>
+   <div class="prow draw" style="--d:3"><span class="n mono muted">4</span><span class="t">Brand systems and guidelines</span><span class="c">Name, identity, a 45-page brand book and a website for a new brand</span><span class="c muted">MIRA</span></div>
+   <div class="prow draw" style="--d:4"><span class="n mono muted">5</span><span class="t">Content made in-house</span><span class="c">Films, avatars, reels and cards with an AI pipeline: agency quality, in-house cost</span><span class="c muted">beep labs · Dice Will Decide</span></div>
+   <div class="prow draw" style="--d:5"><span class="n mono muted">6</span><span class="t">Creators and PR</span><span class="c">Celebrities and bloggers carried a cause for free; 84 media stories</span><span class="c muted">Lighthouse</span></div>
+   <div class="prow draw" style="--d:6"><span class="n mono muted">7</span><span class="t">Briefs and teams</span><span class="c">Built and ran a 37-person creative unit; briefs, scoring and margin control</span><span class="c muted">Realweb</span></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Awards">
+ <div class="awards3">
+  <div>
+   <div class="big">41</div>
+   <p class="mid big-cap">awards in 2023–2025 at the leading Eastern European and CIS festivals</p>
+  </div>
+  <div>
+   <div class="atable">
+    <div class="arow draw" style="--d:0"><span>Silver Mercury</span><span class="n">12</span><span class="h">2 gold</span></div>
+    <div class="arow draw" style="--d:1"><span>E+ Awards (Effie CIS)</span><span class="n">8</span><span class="h">2 gold</span></div>
+    <div class="arow draw" style="--d:2"><span>Red Apple</span><span class="n">6</span><span class="h">Grand Prix, 2 gold</span></div>
+    <div class="arow draw" style="--d:3"><span>Mixx Russia</span><span class="n">3</span><span class="h">Gold</span></div>
+    <div class="arow draw" style="--d:4"><span>Proxima</span><span class="n">2</span><span class="h">2 gold</span></div>
+    <div class="arow draw" style="--d:5"><span>ADCR</span><span class="n">1</span><span class="h">Gold</span></div>
+    <div class="arow draw" style="--d:6"><span>Big Fish, Digital Communications Awards</span><span class="n">2</span><span class="h">2 gold</span></div>
+    <div class="arow draw" style="--d:7"><span>Perspectum, G8, White Square, Jolbors, Blogema, NPBK</span><span class="n">7</span><span class="h">Silver and bronze</span></div>
+   </div>
+   <p class="small muted anote">Jury of Silver Mercury 2023–2025 and Effie 2019. Creative Directors Club since 2019. The SIBUR case is in the book “50 Cases That Changed Marketing”.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Cases">
+ <div class="four">
+  <h2 class="h2 t">Six cases</h2>
+  <div class="flist">
+   <button class="frow draw" style="--d:0" data-go="5"><span class="n mono">1</span><span class="c">Strategy that moved a plant</span><span class="t">Flip the funnel. SIBUR, Vivilen</span></button>
+   <button class="frow draw" style="--d:1" data-go="6"><span class="n mono">2</span><span class="c">The most awarded creative</span><span class="t">A planet unfit for life. Lighthouse</span></button>
+   <button class="frow draw" style="--d:2" data-go="7"><span class="n mono">3</span><span class="c">A tech launch sold on a human truth</span><span class="t">Show the real you. TECNO × MIXIT</span></button>
+   <button class="frow draw" style="--d:3" data-go="8"><span class="n mono">4</span><span class="c">A brand system from a blank page</span><span class="t">Make it real. MIRA</span></button>
+   <button class="frow draw" style="--d:4" data-go="10"><span class="n mono">5</span><span class="c">An English brand film made with AI</span><span class="t">Belongs to people. beep labs</span></button>
+   <button class="frow draw" style="--d:5" data-go="11"><span class="n mono">6</span><span class="c">My own show, made by a few people</span><span class="t">Guardians of Disorder. Dice Will Decide</span></button>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="SIBUR">
+ <div class="case">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">Strategy</span><span class="pill">Campaign</span><span class="pill">B2C → B2B</span><span class="pill ghost mono">2022–2025</span></div>
+    <h2 class="h2 t">Flip the funnel. SIBUR, Vivilen</h2>
+    <p class="body">SIBUR built a plant that turns recycled plastic into packaging polymer. It ran at 20%: only 17 of 100 packaging makers would even discuss eco-materials. Makers don't buy slides. They buy demand on the shelf.</p>
+   </div>
+   <dl class="facts">
+    <div class="draw" style="--d:0"><dt>Strategy</dt><dd>Flip the funnel. First build measurable demand with shoppers, then take the numbers to manufacturers</dd></div>
+    <div class="draw" style="--d:1"><dt>Idea</dt><dd>ENTERCYCLE: not an ad, a movement. Enter the recycling loop</dd></div>
+    <div class="draw" style="--d:2"><dt>Creative</dt><dd>A voting site for eco-packaging, blogger challenges, car-share cars that swapped bottles for ride credits, interactive billboards, and our own marathon bin that catches <span class="mono">30%</span> more bottles</dd></div>
+    <div class="draw" style="--d:3"><dt>Result</dt><dd>Awareness <span class="mono">8.1% → 15.2%</span>, <span class="mono">+13.5 p.p.</span> ready to pay more, <span class="mono">64</span> qualified leads, plant load <span class="mono">20% → 80%</span>. In the book “50 Cases That Changed Marketing”</dd></div>
+   </dl>
+   <div class="credits draw" style="--d:4"><span class="muted">Role</span><span>Ilia Lopukhov, Executive Creative Director, Realweb</span></div>
+  </div>
+  <div class="stack s3">
+   <div class="media"><video data-src="assets/v/sibur_ceo.mp4" poster="assets/v/sibur_ceo.jpg" muted loop playsinline preload="none" aria-label="SIBUR case film, English"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:43</span></div>
+   <div class="sub3">
+    <div class="media"><img src="assets/sibur/urna.jpg" alt="Our own marathon bin" loading="lazy"></div>
+    <div class="media"><img src="assets/sibur/delimobil.jpg" alt="Delimobil car-share × bottle collection" loading="lazy"></div>
+    <div class="media"><img src="assets/sibur/billboard_choose.jpg" alt="Billboard: choose products in Vivilen eco-packaging" loading="lazy"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Lighthouse">
+ <div class="case">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">Special project</span><span class="pill">Social</span><span class="pill ghost mono">2024</span></div>
+    <h2 class="h2 t">A planet unfit for life. Lighthouse</h2>
+    <p class="body">Lighthouse is a children's hospice; 85% of its budget is private donations. People can't picture life with an incurable illness, so they don't give. We made them feel it first.</p>
+   </div>
+   <dl class="facts">
+    <div class="draw" style="--d:0"><dt>Idea</dt><dd>Earth itself is a planet unfit for life for thousands of seriously ill children: gravity you can't move against, air you can't breathe</dd></div>
+    <div class="draw" style="--d:1"><dt>Film</dt><dd>A hand-made animated film about the world through the patients' eyes. Made with Zebra Hero and Invisible Friends, voiced by Alexander Petrov</dd></div>
+    <div class="draw" style="--d:2"><dt>Special project</dt><dd>An interactive site: hover over a hero to read a real child's story. Every donation lights a star with the donor's name</dd></div>
+    <div class="draw" style="--d:3"><dt>Media</dt><dd>Actors and bloggers shared it for free; 84 media stories. OOH and media facades in Moscow</dd></div>
+    <div class="draw" style="--d:4"><dt>Result</dt><dd><span class="mono">4.8M</span> reached, <span class="mono">32K</span> on the site, donations <span class="mono">$100K</span> a month. Red Apple Grand Prix, ADCR and Mixx gold, 15+ awards</dd></div>
+   </dl>
+   <div class="credits draw" style="--d:5"><span class="muted">Role</span><span>Ilia Lopukhov, Executive Creative Director, Realweb</span></div>
+  </div>
+  <div class="stack s3">
+   <div class="media"><video data-src="assets/v/mayak_ceo.mp4" poster="assets/v/mayak_ceo.jpg" muted loop playsinline preload="none" aria-label="Lighthouse case film, English"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:41</span></div>
+   <div class="sub3">
+    <div class="media"><img src="assets/mayak/still.jpg" alt="Film still" loading="lazy"></div>
+    <div class="media"><img src="assets/mayak/poster_en.jpg" alt="Poster, English version" loading="lazy"></div>
+    <div class="media"><img src="assets/mayak/site_en.jpg" alt="Donation site, English version" loading="lazy"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="TECNO × MIXIT">
+ <div class="case">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">Product launch</span><span class="pill">Brand collaboration</span><span class="pill">Creators</span><span class="pill ghost mono">2023</span></div>
+    <h2 class="h2 t">Show the real you. TECNO × MIXIT</h2>
+    <p class="body">TECNO was launching a camera phone with a 40M reach target, in a market where every launch shouts megapixels. 44% of young women would drop filters if they liked their own face more.</p>
+   </div>
+   <dl class="facts">
+    <div class="draw" style="--d:0"><dt>Strategy</dt><dd>No spec war: go to the beauty audience through a partner that shares the value</dd></div>
+    <div class="draw" style="--d:1"><dt>Idea</dt><dd>Show the real you: a camera to express yourself, skincare to love your real face, no filter</dd></div>
+    <div class="draw" style="--d:2"><dt>Creative</dt><dd>A two-level box with MIXIT: the phone and earbuds on top, a five-step skincare routine below. Masha Way as the face of the campaign, an Ozon special project, pop-up zones in malls, creator unboxings</dd></div>
+    <div class="draw" style="--d:3"><dt>Result</dt><dd><span class="mono">80M</span> reached, twice the target. <span class="mono">240K</span> landing visits, <span class="mono">628</span> boxes sold in three weeks, every KPI beaten 2×</dd></div>
+   </dl>
+   <div class="credits draw" style="--d:4"><span class="muted">Role</span><span>Ilia Lopukhov, Chief Creative Officer, Realweb</span></div>
+  </div>
+  <div class="stack s3">
+   <div class="media"><video data-src="assets/v/tecno_ceo.mp4" poster="assets/v/tecno_ceo.jpg" muted loop playsinline preload="none" aria-label="TECNO × MIXIT case film, English"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:43</span></div>
+   <div class="sub3">
+    <div class="media"><img src="assets/tecno/box.jpg" alt="The two-level box" loading="lazy"></div>
+    <div class="media"><img src="assets/tecno/face.jpg" alt="The real face, no filter" loading="lazy"></div>
+    <div class="media"><img src="assets/tecno/skincare.jpg" alt="MIXIT skincare steps" loading="lazy"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="MIRA">
+ <div class="case">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">Naming</span><span class="pill">Identity</span><span class="pill">Guidelines</span><span class="pill">Website</span><span class="pill ghost mono">2023</span></div>
+    <h2 class="h2 t">Make it real. MIRA, Yerevan</h2>
+    <p class="body">A new digital agency with no legacy. It needed a character of its own, to compete with big networks on attitude, not size.</p>
+   </div>
+   <dl class="facts">
+    <div class="draw" style="--d:0"><dt>Task</dt><dd>A brand from scratch: name, positioning, identity, guidelines and website</dd></div>
+    <div class="draw" style="--d:1"><dt>Idea</dt><dd>Make It Real Agency. The explorer archetype and Mars Orange: the agency works where others haven't been yet</dd></div>
+    <div class="draw" style="--d:2"><dt>System</dt><dd>In the “m—·ra” mark the dash and the dot became the tools of the whole identity: a divider, a frame for photos, an accent. A 45-page brand book and the makeitreal.agency site</dd></div>
+   </dl>
+   <div class="credits draw" style="--d:3"><span class="muted">Role</span><span>Ilia Lopukhov, Creative Director</span></div>
+  </div>
+  <div class="mira-r">
+   <div class="browser">
+    <div class="bbar"><i></i><i></i><i></i><span class="url mono">makeitreal.agency</span></div>
+    <div class="media"><video data-src="assets/v/mira_site.mp4" poster="assets/v/mira_site.jpg" muted loop playsinline preload="none" aria-label="makeitreal.agency: first screen and scroll"></video></div>
+   </div>
+   <div class="mira-el">
+    <figure><div class="media"><img src="assets/img/mira_logo-1.jpg" alt="The m—·ra mark on a Mars Orange gradient" loading="lazy"></div><figcaption class="cap muted">The mark</figcaption></figure>
+    <figure><div class="media"><img src="assets/img/mira_brand-elements.jpg" alt="Brand elements from the MIRA guidelines" loading="lazy"></div><figcaption class="cap muted">Brand elements</figcaption></figure>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="MIRA brand book">
+ <div class="bb">
+  <div class="shead">
+   <h2 class="h2 t">One system, 45 pages. The MIRA brand book</h2>
+   <p class="body">Logotype and its misuse, brand elements, two colour palettes, gradient rules, typography, icons, photo and illustration rules, and ready layouts for social and presentations: one rule set for every designer and every format.</p>
+  </div>
+  <div class="bbgrid">
+   <figure class=""><div class="media"><img src="assets/mira/mira_p06-06.jpg" alt="MIRA brand book: Logotype system" loading="lazy"></div><figcaption>Logotype system</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p07-07.jpg" alt="MIRA brand book: Logotype don'ts" loading="lazy"></div><figcaption>Logotype don'ts</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p08-08.jpg" alt="MIRA brand book: Brand elements" loading="lazy"></div><figcaption>Brand elements</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p10-10.jpg" alt="MIRA brand book: Colours" loading="lazy"></div><figcaption>Colours</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p17-17.jpg" alt="MIRA brand book: Gradients" loading="lazy"></div><figcaption>Gradients</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p27-27.jpg" alt="MIRA brand book: Typography" loading="lazy"></div><figcaption>Typography</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p34-34.jpg" alt="MIRA brand book: Photo: do's and don'ts" loading="lazy"></div><figcaption>Photo: do's and don'ts</figcaption></figure>
+   <figure class=""><div class="media"><img src="assets/mira/mira_p44-44.jpg" alt="MIRA brand book: Example: presentation slide" loading="lazy"></div><figcaption>Example: presentation slide</figcaption></figure>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="beep labs">
+ <div class="case vert">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">Brand film</span><span class="pill">AI production</span><span class="pill">Switzerland</span><span class="pill ghost mono">2026</span></div>
+    <h2 class="h2 t">Belongs to people. beep labs</h2>
+    <p class="body">A Swiss robotics-as-a-service start-up: it rents out robots and shares the income with people who invest in the fleet. A complex product, explained in under a minute, in English.</p>
+   </div>
+   <dl class="facts">
+    <div class="draw" style="--d:0"><dt>Research</dt><dd>Market and audience research, then the key pains, insights and the communication concept</dd></div>
+    <div class="draw" style="--d:1"><dt>Film</dt><dd>Shot like a documentary: a warehouse, interviews, real faces. The CEO speaks on camera as his own AI avatar</dd></div>
+    <div class="draw" style="--d:2"><dt>Result</dt><dd>Approved and launched; it still runs inside the beep app as a sales-enablement tool. I left the AI pipeline with the team so they can make new assets without a shoot</dd></div>
+   </dl>
+   <div class="credits draw" style="--d:3"><span class="muted">Role</span><span>Brand &amp; AI Creative Director, freelance</span></div>
+  </div>
+  <div class="vertwrap">
+   <div class="media"><video data-src="assets/v/beep_916.mp4" poster="assets/v/beep_916.jpg" muted loop playsinline preload="none" aria-label="beep labs brand film, 9:16"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:47</span></div>
+   <p class="small muted note">Concept, AI personas, the CEO's digital avatar, generation, voice and edit.</p>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Dice Will Decide">
+ <div class="case">
+  <div class="info">
+   <div class="head">
+    <div class="pills"><span class="pill">My own show</span><span class="pill">Live action + AI animation</span><span class="pill ghost mono">2024–2026</span></div>
+    <h2 class="h2 t">Guardians of Disorder. Dice Will Decide</h2>
+    <p class="body">My animated series based on a live game of D&amp;D. Six actors play at the table, and their moves and rolls become a cartoon in the style of Arcane. This is animation from episodes three to five, once the pipeline was in place.</p>
+   </div>
+   <div class="sfacts">
+    <div class="draw" style="--d:0"><b class="mono">77</b><span>animated scenes in episode three alone</span></div>
+    <div class="draw" style="--d:1"><b class="mono">74</b><span>NPC lip-syncs in the same episode</span></div>
+    <div class="draw" style="--d:2"><b class="mono">2 + 2</b><span>names and marks: channel and season</span></div>
+    <div class="draw" style="--d:3"><b class="mono">15.5K</b><span>likes on one carousel in a day</span></div>
+   </div>
+   <div class="credits draw" style="--d:4"><span class="muted">Role</span><span>Creative director, showrunner, AI director</span></div>
+  </div>
+  <div class="media"><video data-src="assets/show/battle_final.mp4" poster="assets/show/battle_final.jpg" muted loop playsinline preload="none" aria-label="Battle on the shore, episode four"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">1:11</span></div>
+ </div>
+</section>
+
+<section class="slide" data-label="Show identity">
+ <div class="hands">
+  <div class="shead">
+   <h2 class="h2 t">Names, marks, a typeface and dice. The show identity</h2>
+   <p class="body">Everything around the animation I designed and built with AI: two names, the season and channel marks, a custom typeface and six 3D dice. The AI made; I set the task, chose and finished. For this portfolio the marks and the typeface now exist in English too.</p>
+  </div>
+  <div class="hcols">
+   <figure class="hcol">
+    <div class="media logos2"><img src="assets/show_en/guardians_gold.png" alt="Guardians of Disorder logo, gold" class="lg-s"><img src="assets/show_en/dwd_gold.png" alt="Dice Will Decide logo, gold" class="lg-k"></div>
+    <h3 class="mid">Two names, two marks</h3>
+    <p class="small">Guardians of Disorder for the season, lettered as one connected piece with spikes and a swash. Dice Will Decide for the channel: a die inside a ring. Both names are mine; the marks were made with AI from my brief and redrawn in English for this portfolio.</p>
+   </figure>
+   <figure class="hcol">
+    <div class="media"><img src="assets/show_en/font_specimen.jpg" alt="Strazhi Vyaz typeface v1.0, Latin capitals" loading="lazy"></div>
+    <h3 class="mid">A typeface of our own, Strazhi Vyaz</h3>
+    <p class="small">Letters cut from the logo, the missing ones generated in the same hand and assembled into a font. Capitals like the mark, K and R always with a tail. <span class="mono">368</span> glyphs, Cyrillic and Latin, about <span class="mono">10,000</span> kerning pairs.</p>
+   </figure>
+   <figure class="hcol">
+    <div class="media dz"><video data-src="assets/show/dice_patrik.mp4" poster="assets/show/dice_patrik.jpg" muted loop playsinline preload="none" aria-label="Patrick's emerald d20"></video></div>
+    <h3 class="mid">Six d20 stones in Blender</h3>
+    <p class="small">Every hero has a stone. Light refracts inside the facets like in a real one, the numbers are gold on enamel, the 20 carries the team's crest. I built the Blender scene together with AI.</p>
+   </figure>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Battle pipeline">
+ <div class="pipe">
+  <div class="shead">
+   <h2 class="h2 t">3D first, then AI. One minute of battle</h2>
+   <p class="body">71 seconds of battle from episode four. I stage the scene in Blender, like previs on a feature film. The AI paints over it; the director makes the decisions.</p>
+  </div>
+  <div class="media splitv"><video data-src="assets/show/battle_split.mp4" poster="assets/show/battle_split.jpg" muted loop playsinline preload="none" aria-label="Left: 3D animatic, right: the finished shot"></video><span class="tag l">3D animatic, Blender</span><span class="tag r">Finished shot, Seedance 2.5</span><button class="snd" aria-pressed="false">Sound</button></div>
+  <div class="psteps">
+   <div class="draw" style="--d:0"><span class="mono muted">1</span><b>Canon</b><span>The episode recording becomes a 22-shot treatment</span></div>
+   <div class="draw" style="--d:1"><span class="mono muted">2</span><b>Location in Blender</b><span>A 7-metre cliff, morning sun</span></div>
+   <div class="draw" style="--d:2"><span class="mono muted">3</span><b>Blocking</b><span>Figures stand on the terrain; a script checks for intersections</span></div>
+   <div class="draw" style="--d:3"><span class="mono muted">4</span><b>Location plates</b><span>Camera frame → Seedream → MJ Edit</span></div>
+   <div class="draw" style="--d:4"><span class="mono muted">5</span><b>Seedance 2.5</b><span>One generation per shot</span></div>
+   <div class="draw" style="--d:5"><span class="mono muted">6</span><b>Review and edit</b><span>Contact sheets, Whisper on the lines</span></div>
+  </div>
+  <div class="pfoot">
+   <span><b class="mono">4 days</b> from treatment to a finished minute</span>
+   <span><b class="mono">15 of 32</b> runs made the edit</span>
+   
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="How it's made">
+ <div class="flow">
+  <h2 class="h2 t">How it's made: from character sheet to a finished shot</h2>
+  <p class="flabel"><b>Character.</b> Every hero has a sheet: portrait, full body, turnaround, emotions, props. Style and base in Midjourney, refined in Seedream 5 Pro. The same rules keep the family, the house and the product consistent across hundreds of assets.</p>
+  <div class="frow">
+   <figure style="--ar:3/4"><div class="media"><img src="assets/show/gunter_mj.jpg" alt="Raw Midjourney generation, Gunther" loading="lazy" style="object-position:center top"></div><figcaption><span class="mono">1</span> Midjourney: faces, costume, Arcane mood</figcaption></figure>
+   <figure style="--ar:3/4"><div class="media"><img src="assets/show/gunter_portrait.jpg" alt="Gunther's portrait after Seedream" loading="lazy"></div><figcaption><span class="mono">2</span> Seedream: fixing artefacts, clean-up</figcaption></figure>
+   <figure style="--ar:16/9"><div class="media"><img src="assets/show/gunter_turn.jpg" alt="Character sheet: Gunther's turnaround" loading="lazy"></div><figcaption><span class="mono">3</span> Character sheet: four-angle turnaround</figcaption></figure>
+   <figure style="--ar:16/9"><div class="media"><img src="assets/show/gunter_emo.jpg" alt="Character sheet: Gunther's emotions" loading="lazy"></div><figcaption><span class="mono">4</span> Character sheet: emotions for lip-sync</figcaption></figure>
+  </div>
+  <p class="flabel"><b>Animation.</b> Episode breakdown, location plates and start frames with my own skills, then Seedance 2.5.</p>
+  <div class="frow">
+   <figure style="--ar:16/9"><div class="media"><video data-src="assets/show/battle_final.mp4" poster="assets/show/battle_final.jpg" muted loop playsinline preload="none" aria-label="A shot from episode four, Seedance 2.5"></video><button class="snd" aria-pressed="false">Sound</button></div><figcaption><span class="mono">5</span> Seedance 2.5: a shot from the episode</figcaption></figure>
+
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Reels and cards">
+ <div class="reels">
+  <div class="shead">
+   <h2 class="h2 t">One episode, a week of content. Reels and cards</h2>
+   <p class="body">Every episode becomes vertical reels and carousel cards built from the same scenes. For this portfolio two reels are fully dubbed into English: transcribed, translated, re-voiced with a cast of AI voices and mixed over the original music and table sound. The cards are re-rendered in English from the same project files.</p>
+  </div>
+  <div class="rrow">
+   <figure class="r916"><div class="media"><video data-src="assets/show_en/reel_s3_01_patrick_dead_pelt.mp4" poster="assets/show_en/reel_s3_01_patrick_dead_pelt.jpg" muted loop playsinline preload="none" aria-label="Reel: Patrick, You're a dead rug, English dub"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:27</span></div><figcaption>Reel, English dub: “You're a dead rug!”</figcaption></figure>
+   <figure class="r916"><div class="media"><video data-src="assets/show_en/reel_s3_02_elliana_noble.mp4" poster="assets/show_en/reel_s3_02_elliana_noble.jpg" muted loop playsinline preload="none" aria-label="Reel: Elliana, a noble elf, English dub"></video><button class="snd" aria-pressed="false">Sound</button><span class="dur mono">0:18</span></div><figcaption>Reel, English dub: “I'm a noble elf, actually”</figcaption></figure>
+   <figure class="r45"><div class="media"><video data-src="assets/show_en/card_B2-01_fireball.mp4" poster="assets/show_en/card_B2-01_fireball.jpg" muted loop playsinline preload="none" aria-label="Card: fireball"></video></div><figcaption>Card: fireball</figcaption></figure>
+   <figure class="r45"><div class="media"><video data-src="assets/show_en/card_B2-07_mimic.mp4" poster="assets/show_en/card_B2-07_mimic.jpg" muted loop playsinline preload="none" aria-label="Card: mimic"></video></div><figcaption>Card: mimic</figcaption></figure>
+   <figure class="r45"><div class="media"><video data-src="assets/show_en/card_B4-08_bardic_inspiration.mp4" poster="assets/show_en/card_B4-08_bardic_inspiration.jpg" muted loop playsinline preload="none" aria-label="Card: bardic inspiration"></video></div><figcaption>Card: bardic inspiration</figcaption></figure>
+  </div>
+  <div class="rfoot">
+   <span><b class="mono">15.5K</b> likes on one carousel in a day</span>
+   <span><b class="mono">3,852</b> shares</span>
+   <span><b class="mono">2,415</b> saves</span>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-label="Thank you">
+ <div class="final" style="height:100%">
+  <p class="pair">Happy to hear your feedback</p>
+  <div class="sign">
+   <span>Ilia Lopukhov</span>
+   <div class="contact">
+    <a class="mono muted" href="mailto:willylorraine@gmail.com" id="mail">willylorraine@gmail.com</a>
+    <span class="mono muted">+62 821 4690 5234</span>
+    <button class="copy" id="copy">Copy email</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  const slides=[...document.querySelectorAll('.slide')];
+  const N=slides.length;
+  const count=document.getElementById('count'), label=document.getElementById('label');
+  const mq=matchMedia('(max-width: 820px)');
+  let cur=0, lock=0;
+
+  // заголовки по словам
+  document.querySelectorAll('.t').forEach(h=>{
+    const words=h.textContent.trim().split(/\s+/);
+    h.innerHTML=words.map((w,i)=>'<span class="w" style="--i:'+i+'">'+w+'</span>').join(' ');
+    h.setAttribute('aria-label',words.join(' '));
+  });
+
+  function fit(){
+    if(mq.matches){stage.style.removeProperty('--k');return}
+    const k=Math.min((innerWidth-32)/1920,(innerHeight-24)/1080);
+    stage.style.setProperty('--k',k);
+  }
+  addEventListener('resize',fit); fit();
+
+  function load(s){ if(location.search.indexOf('pdf')>-1) return; s.querySelectorAll('video[data-src]').forEach(v=>{ if(!v.src){v.src=v.dataset.src} }); }
+  function stopAll(except){
+    document.querySelectorAll('video').forEach(v=>{
+      if(except && except.contains(v)) return;
+      v.pause(); v.muted=true;
+      const b=v.parentElement.querySelector('.snd'); if(b){b.setAttribute('aria-pressed','false');b.textContent='Sound'}
+    });
+  }
+  function playIn(s){ s.querySelectorAll('video').forEach(v=>{ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); }); }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    if(mq.matches){ slides[i].scrollIntoView({behavior:'smooth'}); return }
+    slides[cur].classList.remove('is-active','first');
+    cur=i; const s=slides[cur];
+    s.classList.add('is-active');
+    count.textContent=(cur+1)+' / '+N;
+    label.textContent=s.dataset.label||'';
+    [cur-1,cur,cur+1].forEach(j=>{ if(slides[j]) load(slides[j]) });
+    stopAll(s); playIn(s);
+    try{ history.replaceState(null,'','#'+(cur+1)) }catch(e){}
+  }
+
+  document.getElementById('prev').onclick=()=>go(cur-1);
+  document.getElementById('next').onclick=()=>go(cur+1);
+  addEventListener('keydown',e=>{
+    if(mq.matches) return;
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}
+    if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1)}
+    if(e.key==='Home')go(0); if(e.key==='End')go(N-1);
+  });
+  addEventListener('wheel',e=>{
+    if(mq.matches) return;
+    const now=Date.now(); if(now-lock<900||Math.abs(e.deltaY)<20) return;
+    lock=now; go(cur+(e.deltaY>0?1:-1));
+  },{passive:true});
+  let tx=null;
+  addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  addEventListener('touchend',e=>{ if(mq.matches||tx===null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>50) go(cur+(dx<0?1:-1)); tx=null });
+
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(+b.dataset.go-1)));
+
+  // звук по клику
+  function toggle(v){
+    const b=v.parentElement.querySelector('.snd');
+    const on=v.muted;
+    if(on){ stopAll(v.closest('.slide')); v.parentElement.parentElement.querySelectorAll('video').forEach(o=>{ if(o!==v){o.muted=true; const ob=o.parentElement.querySelector('.snd'); if(ob){ob.setAttribute('aria-pressed','false');ob.textContent='Sound'}} }); v.currentTime=0; v.muted=false; const p=v.play(); if(p&&p.catch)p.catch(()=>{}) }
+    else { v.muted=true }
+    if(b){ b.setAttribute('aria-pressed',String(on)); b.textContent=on?'Mute':'Sound' }
+  }
+  document.querySelectorAll('.media video').forEach(v=>v.addEventListener('click',()=>toggle(v)));
+  document.querySelectorAll('.snd').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); const v=b.parentElement.querySelector('video'); if(!v.src) v.src=v.dataset.src; toggle(v)}));
+
+  // превью в списке работ
+  const peek=document.getElementById('peek'), pimg=document.getElementById('peekimg');
+  const tbl=document.getElementById('itable');
+  if(tbl) tbl.querySelectorAll('.row[data-peek]').forEach(r=>{
+    r.addEventListener('mouseenter',()=>{ pimg.src=r.dataset.peek; peek.classList.add('on') });
+    r.addEventListener('mouseleave',()=>peek.classList.remove('on'));
+    r.addEventListener('mousemove',e=>{
+      const k=parseFloat(stage.style.getPropertyValue('--k'))||1;
+      const box=stage.getBoundingClientRect();
+      const x=(e.clientX-box.left)/k, y=(e.clientY-box.top)/k;
+      peek.style.left=Math.min(x+28,1920-330)+'px'; peek.style.top=(y-80)+'px';
+    });
+  });
+
+  // почта
+  const copyBtn=document.getElementById('copy');
+  copyBtn.addEventListener('click',()=>{
+    const addr='willylorraine@gmail.com';
+    const done=()=>{copyBtn.textContent='Email copied'; setTimeout(()=>copyBtn.textContent='Copy email',2200)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(addr).then(done).catch(sel) } else sel();
+    function sel(){ const r=document.createRange(); r.selectNodeContents(document.getElementById('mail')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); copyBtn.textContent='Selected, press ⌘C' }
+  });
+
+  // телефон: лента, видео играет в кадре
+  let io=null;
+  function setupMobile(){
+    if(io){io.disconnect();io=null}
+    if(!mq.matches){ slides.forEach(s=>s.classList.remove('is-active')); const h=parseInt((location.hash||'').slice(1),10); cur=0; go(isNaN(h)?0:h-1); const a=slides[cur]; a.classList.add('instant','first'); requestAnimationFrame(()=>requestAnimationFrame(()=>a.classList.remove('instant'))); return }
+    slides.forEach(s=>s.classList.add('is-active'));
+    io=new IntersectionObserver(es=>es.forEach(en=>{
+      en.target.querySelectorAll('video').forEach(v=>{
+        if(en.isIntersecting){ if(!v.src)v.src=v.dataset.src; const p=v.play(); if(p&&p.catch)p.catch(()=>{}) } else { v.pause() }
+      });
+    }),{threshold:.35});
+    document.querySelectorAll('.media').forEach(m=>io.observe(m));
+  }
+  addEventListener('hashchange',()=>{ const h=parseInt(location.hash.slice(1),10); if(!isNaN(h)&&h-1!==cur) go(h-1) });
+  mq.addEventListener('change',()=>{fit();setupMobile()});
+  setupMobile();
+})();
+</script>
